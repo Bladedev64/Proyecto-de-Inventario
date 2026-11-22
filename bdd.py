@@ -1,91 +1,152 @@
-import sqlite3
-from tkinter import ttk, messagebox 
-from producto import Producto  # Importamos la clase Producto del módulo producto.py
+# Clase BaseDatos
+# aqui esta todo lo que tiene que ver con MySQL
+import os
 
-# Clase para manejar la base de datos
+import mysql.connector
+
+from producto import Producto
+from venta import Venta
+
+# datos para entrar a MySQL. Si tu MySQL tiene otra clave cambiala aqui
+HOST = "localhost"
+PUERTO = 3306
+USUARIO = "root"
+CLAVE = "root"
+BASE = "inventario_db"
+
+ARCHIVO_SQL = os.path.join(os.path.dirname(__file__), "base_datos.sql")
+
+
+class ErrorBaseDatos(Exception):
+    pass
+
+
 class BaseDatos:
     def __init__(self):
-        # Conexión a la base de datos SQLite
-        self.conexion = sqlite3.connect("inventario.db")
-        self.cursor = self.conexion.cursor()  # Creación de un cursor para ejecutar consultas SQL
-        self.crear_tabla()  # Llamada al método para crear la tabla si no existe
+        self.con = None
+        self.conectar()
+        self.crearTablas()
 
-    def crear_tabla(self):
-        # Ejecución de la consulta SQL para crear la tabla de productos si no existe
-        self.cursor.execute('''
-            CREATE TABLE IF NOT EXISTS productos (
-                producto_id INTEGER PRIMARY KEY,
-                nombre TEXT NOT NULL,
-                descripcion TEXT,
-                precio REAL NOT NULL,
-                cantidad_stock INTEGER NOT NULL,
-                proveedor TEXT
-            )
-        ''')
-        self.conexion.commit()  # Confirmación de los cambios en la base de datos
-
-    def obtener_productos(self):
-        self.cursor.execute("SELECT * FROM productos")
-        rows = self.cursor.fetchall()  # Obtención de todas las filas resultantes
-        return [Producto(*row) for row in rows] # Creación de objetos Producto a partir de las filas y retorno de una lista de productos
-
-    def agregar_producto(self, producto):
-        # Ejecución de la consulta SQL para insertar un nuevo producto en la tabla
-        self.cursor.execute('''
-            INSERT INTO productos (nombre, descripcion, precio, cantidad_stock, proveedor)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (producto.nombre, producto.descripcion, producto.precio, producto.cantidad_stock, producto.proveedor))
-        self.conexion.commit()  # Confirmación de los cambios en la base de datos
-
-    def eliminar_producto(self, producto):
-        self.cursor.execute('''
-             DELETE FROM productos WHERE producto_id=?               
-        ''', (producto.producto_id,))
-        self.conexion.commit()
-        
-    def actualizar_producto(self, producto):
+    def conectar(self):
         try:
-            # Ejecutar la consulta SQL para actualizar el producto
-            self.cursor.execute('''
-                UPDATE productos SET nombre=?, descripcion=?, precio=?, cantidad_stock=?, proveedor=? WHERE producto_id=?
-            ''', (producto.nombre, producto.descripcion, producto.precio, producto.cantidad_stock, producto.proveedor, producto.producto_id))
-            self.conexion.commit()  # Confirmar los cambios en la base de datos
-        except sqlite3.Error as error:
-            # Manejar cualquier error de base de datos
-            messagebox.showerror("Error en base de datos", f"No se pudo actualizar el producto: {error}")
-    
-    def buscar_productos_por_nombre(self, nombre):
-        try:
-            # Consulta SQL para buscar productos por coincidencia de nombre
-            self.cursor.execute("SELECT * FROM productos WHERE nombre LIKE ?", ('%' + nombre + '%',))
-            productos = self.cursor.fetchall()
-            self.conexion.commit()
-        except sqlite3.Error as error:
-            # Manejar cualquier error de base de datos
-            messagebox.showerror("Error en base de datos", f"No se pudo obtener el producto: {error}")
-        return productos
-    
-    def buscar_productos_por_proveedor(self, proveedor):
-        try:
-            # Consulta SQL para buscar productos por proveedor
-            self.cursor.execute("SELECT * FROM productos WHERE proveedor=?", (proveedor,))
-            productos = self.cursor.fetchall()
-            self.conexion.commit()
-        except sqlite3.Error as error:
-            # Manejar cualquier error de base de datos
-            messagebox.showerror("Error en base de datos", f"No se pudo obtener el producto: {error}")
+            self.con = mysql.connector.connect(host=HOST, port=PUERTO, user=USUARIO, password=CLAVE)
+        except mysql.connector.Error:
+            # en XAMPP el usuario root no tiene clave, entonces pruebo sin clave
+            try:
+                self.con = mysql.connector.connect(host=HOST, port=PUERTO, user=USUARIO, password="")
+            except mysql.connector.Error as err:
+                raise ErrorBaseDatos(f"No hay conexión con MySQL: {err}")
+
+        cur = self.con.cursor()
+        cur.execute(f"CREATE DATABASE IF NOT EXISTS {BASE}")
+        cur.execute(f"USE {BASE}")
+        cur.close()
+
+    def cerrar(self):
+        if self.con:
+            self.con.close()
+
+    # TABLAS
+
+    def crearTablas(self):
+        # las tablas y los productos de prueba estan en base_datos.sql
+        f = open(ARCHIVO_SQL, encoding="utf-8")
+        lineas = []
+        for linea in f:
+            if not linea.startswith("--"):
+                lineas.append(linea)
+        f.close()
+        ordenes = "".join(lineas).split(";")
+
+        cur = self.con.cursor()
+        for orden in ordenes:
+            if orden.strip().startswith("CREATE TABLE"):
+                cur.execute(orden)
+
+        # los productos de prueba solo se meten si la tabla esta vacia
+        cur.execute("SELECT COUNT(*) FROM productos")
+        cantidad = cur.fetchone()[0]
+        if cantidad == 0:
+            for orden in ordenes:
+                if orden.strip().startswith("INSERT"):
+                    cur.execute(orden)
+        self.con.commit()
+        cur.close()
+
+    # PRODUCTOS
+
+    def traerProductos(self):
+        cur = self.con.cursor()
+        cur.execute("SELECT producto_id, nombre, descripcion, precio, cantidad_stock, proveedor, stock_minimo "
+                    "FROM productos ORDER BY producto_id")
+        productos = []
+        for fila in cur.fetchall():
+            productos.append(Producto(*fila))
+        cur.close()
         return productos
 
-    def buscar_producto_por_id(self, producto_id):
+    def insertarProducto(self, prod):
+        cur = self.con.cursor()
         try:
-            # Consulta SQL para buscar un producto por ID
-            self.cursor.execute("SELECT * FROM productos WHERE producto_id=?", (producto_id,))
-            producto = self.cursor.fetchone()
-            self.conexion.commit()
-        except sqlite3.Error as error:
-            # Manejar cualquier error de base de datos
-            messagebox.showerror("Error en base de datos", f"No se pudo obtener el producto: {error}")
-        return producto
-    
-    def cerrar_conexion(self):
-        self.conexion.close()  # Cierre de la conexión a la base de datos
+            cur.execute("INSERT INTO productos (nombre, descripcion, precio, cantidad_stock, proveedor, stock_minimo) "
+                        "VALUES (%s, %s, %s, %s, %s, %s)",
+                        (prod.nombre, prod.descripcion, prod.precio, prod.cantidad_stock,
+                         prod.proveedor, prod.stock_minimo))
+            self.con.commit()
+        except mysql.connector.Error as err:
+            raise ErrorBaseDatos(f"No se pudo guardar: {err}")
+        finally:
+            cur.close()
+
+    def cambiarProducto(self, prod):
+        cur = self.con.cursor()
+        try:
+            cur.execute("UPDATE productos SET nombre = %s, descripcion = %s, precio = %s, cantidad_stock = %s, "
+                        "proveedor = %s, stock_minimo = %s WHERE producto_id = %s",
+                        (prod.nombre, prod.descripcion, prod.precio, prod.cantidad_stock,
+                         prod.proveedor, prod.stock_minimo, prod.producto_id))
+            self.con.commit()
+        except mysql.connector.Error as err:
+            raise ErrorBaseDatos(f"No se pudo guardar: {err}")
+        finally:
+            cur.close()
+
+    def borrarProducto(self, prod):
+        cur = self.con.cursor()
+        try:
+            cur.execute("DELETE FROM productos WHERE producto_id = %s", (prod.producto_id,))
+            self.con.commit()
+        except mysql.connector.Error as err:
+            raise ErrorBaseDatos(f"No se pudo eliminar: {err}")
+        finally:
+            cur.close()
+
+    # VENTAS
+
+    def traerVentas(self):
+        cur = self.con.cursor()
+        cur.execute("SELECT venta_id, cant_articulos, medio_pago, total, productos, fecha_registro "
+                    "FROM ventas ORDER BY venta_id")
+        ventas = []
+        for fila in cur.fetchall():
+            ventas.append(Venta(*fila))
+        cur.close()
+        return ventas
+
+    def registrarVenta(self, venta, lineas):
+        # lineas es una lista de (producto_id, cantidad)
+        # primero bajo el stock de cada producto y despues guardo la venta.
+        # Si algo falla hago rollback para que no quede la mitad guardada
+        cur = self.con.cursor()
+        try:
+            for producto_id, cantidad in lineas:
+                cur.execute("UPDATE productos SET cantidad_stock = cantidad_stock - %s WHERE producto_id = %s",
+                            (cantidad, producto_id))
+            cur.execute("INSERT INTO ventas (cant_articulos, medio_pago, total, productos) VALUES (%s, %s, %s, %s)",
+                        (venta.cant_articulos, venta.medio_pago, venta.total, venta.productos))
+            self.con.commit()
+        except mysql.connector.Error as err:
+            self.con.rollback()
+            raise ErrorBaseDatos(f"No se pudo guardar la venta: {err}")
+        finally:
+            cur.close()

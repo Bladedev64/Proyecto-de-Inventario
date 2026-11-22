@@ -1,8 +1,4 @@
-import tkinter as tk
-from interfazinventario import InterfazInventario
+# Para abrir el programa: python main.py
+from ui.app import iniciar
 
-# Inicialización de la aplicación
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = InterfazInventario(root)
-    root.mainloop()
+iniciar()
