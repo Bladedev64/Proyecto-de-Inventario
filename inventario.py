@@ -3,19 +3,18 @@ class Inventario:
     def __init__(self):
         self.productos = []
 
-    def agregar_producto(self, producto):
-        self.productos.append(producto)
+    def agregarProducto(self, prod):
+        self.productos.append(prod)
 
-    def eliminar_producto(self, producto):
-        self.productos = [p for p in self.productos if p.producto_id != producto.producto_id]
+    def borrarProducto(self, prod):
+        self.productos = [p for p in self.productos if p.producto_id != prod.producto_id]
 
-
-    def buscar_producto(self, producto_id):
-        for producto in self.productos:
-            if producto.producto_id == producto_id:
-                return producto
+    def buscarProducto(self, prodId):
+        for prod in self.productos:
+            if prod.producto_id == prodId:
+                return prod
         return None
 
-    def generar_informe(self):
-        informe = [producto.obtener_detalles() for producto in self.productos]
-        return informe
+    def hacerInforme(self):
+        reporte = [prod.obtener_detalles() for prod in self.productos]
+        return reporte

@@ -3,47 +3,47 @@ from producto import Producto  # Importamos la clase Producto del módulo produc
 
 # Clase Venta
 class Venta:
-    def __init__(self, venta_id, cant_articulos, medio_pago, total, productos):
-        self.venta_id = venta_id
-        self._cant_articulos = cant_articulos
-        self._medio_pago = medio_pago
+    def __init__(self, ventaId, cantArt, medioPago, total, prods):
+        self.venta_id = ventaId
+        self._cantArt = cantArt
+        self._medioPago = medioPago
         self._total = total
-        self._productos = productos
+        self._prods = prods
 
     # CANTIDAD ARTICULOS
     @property
     def cant_articulos(self):
-        return self._cant_articulos
+        return self._cantArt
     @cant_articulos.setter
-    def cant_articulos(self, nueva_cant_articulos):
-        self._cant_articulos = nueva_cant_articulos
+    def cant_articulos(self, valor):
+        self._cantArt = valor
 
     # MEDIO DE PAGO
     @property
     def medio_pago(self):
-        return self._medio_pago
+        return self._medioPago
     @medio_pago.setter
-    def medio_pago(self, nuevo_medio_pago):
-        self._medio_pago = nuevo_medio_pago
+    def medio_pago(self, valor):
+        self._medioPago = valor
     
     # TOTAL  
     @property
     def total(self):
         return self._total
     @total.setter
-    def total(self, nuevo_total):
-        self._total = nuevo_total
+    def total(self, valor):
+        self._total = valor
     
     # PRODUCTOS
     @property
     def productos(self):
-        return self._productos
+        return self._prods
     @productos.setter
-    def productos(self, nuevos_productos):
-        self._productos = nuevos_productos
+    def productos(self, valor):
+        self._prods = valor
 
     # OBTENER VENTA
-    def obtener_venta(self):
-        venta = f"ID: {self.venta_id}\nCantidad de artículos: {self.cant_articulos}\nMedio de pago: {self.medio_pago}\n"
-        venta += f"Total: {self.total}\nProductos: {self.productos}"
-        return venta
+    def verVenta(self):
+        texto = f"ID: {self.venta_id}\nCantidad de artículos: {self.cant_articulos}\nMedio de pago: {self.medio_pago}\n"
+        texto += f"Total: {self.total}\nProductos: {self.productos}"
+        return texto
