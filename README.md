@@ -18,13 +18,19 @@ En la terminal ejecutar:
 2. python main.py
 
 Para entrar a MySQL usa el usuario root con clave root, y si no puede entra sin clave
-(así viene XAMPP). Si tu clave es otra cámbiala arriba en `bdd.py`.
+así viene XAMPP. Si la clave es otra cámbiala arriba en `bdd.py`.
 
 ## Base de datos
 
-Está en `base_datos.sql`. La primera vez que abres el programa crea la base
-`inventario_db` con las tablas `productos` y `ventas`, y si no hay productos mete
-unos de prueba.
+Está en `base_datos.sql`. 
+El programa crea la base `inventario_db` con las tablas `productos` y `ventas`.
+
+## Para borrar la base de datos
+
+1. Abre XAMPP y dale Start a MySQL y a Apache para entrar a phpMyAdmin
+2. Entra a http://localhost/phpmyadmin y ve a la pestaña SQL
+3. Pega esto: "DROP DATABASE IF EXISTS inventario_db"  y dale Continuar, para borras la base de datos.
+
 
 ## Archivos
 
