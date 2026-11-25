@@ -5,7 +5,7 @@ from producto import Producto
 from venta import Venta
 
 # datos de MySQL, si tu clave es otra cambiala aqui
-HOST = "localhost"
+HOST = "127.0.0.1"
 PUERTO = 3306
 USUARIO = "root"
 CLAVE = "root"
@@ -28,26 +28,21 @@ class BaseDatos:
             # en XAMPP root no tiene clave
             try:
                 self.con = mysql.connector.connect(host=HOST, port=PUERTO, user=USUARIO, password="")
-            except mysql.connector.Error as err:
-                raise ErrorBaseDatos(f"No hay conexión con MySQL: {err}")
+            except mysql.connector.Error:
+                raise ErrorBaseDatos("No hay conexión con MySQL")
 
         # reviso que esten la base y las tablas
-        cur = self.con.cursor()
-        cur.execute("SHOW DATABASES LIKE %s", (BASE,))
-        if cur.fetchone() is None:
+        try:
+            cur = self.con.cursor()
+            cur.execute(f"USE {BASE}")
+            cur.execute("SELECT COUNT(*) FROM productos")
+            cur.fetchall()
+            cur.execute("SELECT COUNT(*) FROM ventas")
+            cur.fetchall()
             cur.close()
+        except mysql.connector.Error:
             self.cerrar()
-            raise ErrorBaseDatos(f"No existe la base {BASE}")
-        cur.execute(f"USE {BASE}")
-
-        cur.execute("SHOW TABLES")
-        tablas = []
-        for fila in cur.fetchall():
-            tablas.append(fila[0])
-        cur.close()
-        if "productos" not in tablas or "ventas" not in tablas:
-            self.cerrar()
-            raise ErrorBaseDatos(f"Faltan tablas en {BASE}")
+            raise ErrorBaseDatos("Falta crear la base de datos")
 
     def cerrar(self):
         if self.con:

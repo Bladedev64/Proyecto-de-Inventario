@@ -20,7 +20,7 @@ En la terminal ejecutar:
 2. python main.py
 
 Para entrar a MySQL usa el usuario root con clave root, y si no puede entra sin clave
-(así viene XAMPP). Si la clave es otra cámbiala arriba en `bdd.py`.
+así viene XAMPP. Si la clave es otra cámbiala arriba en bdd.py.
 
 ## Base de datos
 
@@ -37,6 +37,13 @@ aparecer `inventario_db` con las tablas `productos` y `ventas`.
 Ojo: si ya tenías la base `inventario_db`, esto la borra y la crea de nuevo con los
 productos de prueba.
 
+## Si sale No hay conexión
+
+- Revisa que MySQL esté prendido en XAMPP
+- Revisa que hayas creado la base con los pasos de arriba
+- Si tu MySQL tiene otra clave cámbiala en `CLAVE` arriba en `bdd.py`
+
+Después dale al botón Intenta de nuevo.
 
 ## Archivos
 
