@@ -1,7 +1,9 @@
 -- Base de datos del inventario
--- el programa la crea solo al abrirlo, pero tambien se puede correr en Workbench
+-- se copia y pega en phpMyAdmin, en la pestaña SQL
+-- ojo: primero borra la base si ya existe, para empezar de cero
 
-CREATE DATABASE IF NOT EXISTS inventario_db;
+DROP DATABASE IF EXISTS inventario_db;
+CREATE DATABASE inventario_db;
 USE inventario_db;
 
 CREATE TABLE IF NOT EXISTS productos (

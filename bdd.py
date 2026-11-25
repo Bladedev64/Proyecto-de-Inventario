@@ -1,7 +1,5 @@
 # Clase BaseDatos
 # aqui esta todo lo que tiene que ver con MySQL
-import os
-
 import mysql.connector
 
 from producto import Producto
@@ -14,8 +12,6 @@ USUARIO = "root"
 CLAVE = "root"
 BASE = "inventario_db"
 
-ARCHIVO_SQL = os.path.join(os.path.dirname(__file__), "base_datos.sql")
-
 
 class ErrorBaseDatos(Exception):
     pass
@@ -25,7 +21,6 @@ class BaseDatos:
     def __init__(self):
         self.con = None
         self.conectar()
-        self.crearTablas()
 
     def conectar(self):
         try:
@@ -37,41 +32,27 @@ class BaseDatos:
             except mysql.connector.Error as err:
                 raise ErrorBaseDatos(f"No hay conexión con MySQL: {err}")
 
+        # la base ya no se crea sola, hay que crearla en phpMyAdmin con base_datos.sql
         cur = self.con.cursor()
-        cur.execute(f"CREATE DATABASE IF NOT EXISTS {BASE}")
+        cur.execute("SHOW DATABASES LIKE %s", (BASE,))
+        if cur.fetchone() is None:
+            cur.close()
+            self.cerrar()
+            raise ErrorBaseDatos(f"No hay conexión")
         cur.execute(f"USE {BASE}")
+
+        cur.execute("SHOW TABLES")
+        tablas = []
+        for fila in cur.fetchall():
+            tablas.append(fila[0])
         cur.close()
+        if "productos" not in tablas or "ventas" not in tablas:
+            self.cerrar()
+            raise ErrorBaseDatos(f"Faltan tablas en {BASE}.\nVuelve a correr base_datos.sql en phpMyAdmin")
 
     def cerrar(self):
         if self.con:
             self.con.close()
-
-    # TABLAS
-
-    def crearTablas(self):
-        # las tablas y los productos de prueba estan en base_datos.sql
-        f = open(ARCHIVO_SQL, encoding="utf-8")
-        lineas = []
-        for linea in f:
-            if not linea.startswith("--"):
-                lineas.append(linea)
-        f.close()
-        ordenes = "".join(lineas).split(";")
-
-        cur = self.con.cursor()
-        for orden in ordenes:
-            if orden.strip().startswith("CREATE TABLE"):
-                cur.execute(orden)
-
-        # los productos de prueba solo se meten si la tabla esta vacia
-        cur.execute("SELECT COUNT(*) FROM productos")
-        cantidad = cur.fetchone()[0]
-        if cantidad == 0:
-            for orden in ordenes:
-                if orden.strip().startswith("INSERT"):
-                    cur.execute(orden)
-        self.con.commit()
-        cur.close()
 
     # PRODUCTOS
 

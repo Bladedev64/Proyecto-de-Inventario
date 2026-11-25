@@ -1,7 +1,7 @@
 import ttkbootstrap as tb
 
 from ui.componentes import Tabla, Vista, texto
-from ui.config import ROJO, VERDE, plural, soles
+from ui.config import ROJO, VERDE, soles
 
 # los cuadros de arriba: (clave, titulo)
 CUADROS = [("equipos", "Equipos distintos"), ("unidades", "Unidades en almacén"),
@@ -16,7 +16,7 @@ class VistaPanel(Vista):
         cols.columnconfigure((0, 1, 2), weight=1, uniform="col")
         cols.rowconfigure(1, weight=1)
 
-        # fila de cuadros con un numero grande y una linea abajo
+        # fila de cuadros con un numero grande
         fila = tb.Frame(cols)
         fila.grid(row=0, column=0, columnspan=3, sticky="ew", pady=(0, 14))
         self.cuadros = {}
@@ -29,9 +29,7 @@ class VistaPanel(Vista):
                 caja.grid(row=0, column=i, sticky="nsew", padx=(10, 0))
             numero = texto(caja, "-", tam=17, negrita=True)
             numero.pack(anchor="w")
-            abajo = texto(caja, gris=True, tam=9)
-            abajo.pack(anchor="w")
-            self.cuadros[clave] = (numero, abajo)
+            self.cuadros[clave] = numero
 
         caja = tb.Labelframe(cols, text="Cómo está el stock", padding=14)
         caja.grid(row=1, column=0, sticky="nsew")
@@ -57,18 +55,18 @@ class VistaPanel(Vista):
         r = self.app.inventario.resumen()
         ventas = self.app.ventas
 
-        self.cuadro("equipos", r["productos"], f"costo medio {soles(r['promedio'])}")
-        self.cuadro("unidades", r["unidades"], "sumando todo")
-        self.cuadro("valor", soles(r["valor"]), "lo que cuesta todo junto")
+        self.cuadro("equipos", r["productos"])
+        self.cuadro("unidades", r["unidades"])
+        self.cuadro("valor", soles(r["valor"]))
         if r["faltan"] == 0:
-            self.cuadro("faltan", 0, "todo bien", VERDE)
+            self.cuadro("faltan", 0, VERDE)
         else:
             # rojo si hay agotados, si no amarillo
             color = "#A16207"
             if r["agotados"] > 0:
                 color = ROJO
-            self.cuadro("faltan", r["faltan"], f"{r['agotados']} agotados y {r['bajos']} con poco", color)
-        self.cuadro("vendido", soles(ventas.ingresos()), plural(len(ventas.ventas), "venta", "ventas"))
+            self.cuadro("faltan", r["faltan"], color)
+        self.cuadro("vendido", soles(ventas.ingresos()))
 
         bien = r["productos"] - r["faltan"]
         total = r["productos"]
@@ -96,7 +94,5 @@ class VistaPanel(Vista):
             filas.append((v.venta_id, (f"#{v.venta_id}", v.medio_pago, soles(v.total)), None))
         self.ultimas.cargar(filas)
 
-    def cuadro(self, clave, valor, linea, color=""):
-        numero, abajo = self.cuadros[clave]
-        numero.configure(text=valor, foreground=color)
-        abajo.configure(text=linea)
+    def cuadro(self, clave, valor, color=""):
+        self.cuadros[clave].configure(text=valor, foreground=color)

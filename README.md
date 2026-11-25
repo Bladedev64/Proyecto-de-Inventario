@@ -7,29 +7,31 @@ la parte de los productos que faltan la decide Prolog.
 ## Qué necesitas
 
 - Python 3.10 o más
-- MySQL prendido (XAMPP o Workbench)
+- XAMPP con MySQL prendido
 - SWI-Prolog para la pestaña Faltantes. Si no lo tienes instálalo en la terminal de PowerShell con:
   winget install SWI-Prolog.SWI-Prolog
 
 ## Cómo abrirlo
+
+Primero crea la base de datos (mira la parte de Base de datos más abajo).
 
 En la terminal ejecutar: 
 1. pip install -U mysql-connector-python ttkbootstrap
 2. python main.py
 
 Para entrar a MySQL usa el usuario root con clave root, y si no puede entra sin clave
-así viene XAMPP. Si la clave es otra cámbiala arriba en `bdd.py`.
+(así viene XAMPP). Si la clave es otra cámbiala arriba en `bdd.py`.
 
 ## Base de datos
 
-Está en `base_datos.sql`. 
-El programa crea la base `inventario_db` con las tablas `productos` y `ventas`.
+Antes de abrir el programa hay que crear la base de datos:
 
-## Para borrar la base de datos
-
-1. Abre XAMPP y dale Start a MySQL y a Apache para entrar a phpMyAdmin
+1. Abre XAMPP y dale Start a MySQL y a Apache
 2. Entra a http://localhost/phpmyadmin y ve a la pestaña SQL
-3. Pega esto: "DROP DATABASE IF EXISTS inventario_db"  y dale Continuar, para borras la base de datos.
+3. Copia todo el código de `base_datos.sql`, pégalo y dale Continuar
+
+Ojo: si ya tenías la base `inventario_db`, esto la borra y la crea de nuevo con los
+productos de prueba.
 
 
 ## Archivos
