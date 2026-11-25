@@ -3,12 +3,12 @@ import ttkbootstrap as tb
 from ui.componentes import Tabla, Vista, texto
 from ui.config import ROJO, VERDE, soles
 
-# los cuadros de arriba: (clave, titulo)
+# cuadros de arriba
 CUADROS = [("equipos", "Equipos distintos"), ("unidades", "Unidades en almacén"),
            ("valor", "Plata en el almacén"), ("faltan", "Faltantes"), ("vendido", "Total en ventas")]
 
 
-# Pestaña Inicio: los numeros de la tienda, el medidor y las ultimas ventas
+# Pestaña Inicio
 class VistaPanel(Vista):
     def armar(self):
         cols = tb.Frame(self)
@@ -16,7 +16,7 @@ class VistaPanel(Vista):
         cols.columnconfigure((0, 1, 2), weight=1, uniform="col")
         cols.rowconfigure(1, weight=1)
 
-        # fila de cuadros con un numero grande
+        # fila de cuadros
         fila = tb.Frame(cols)
         fila.grid(row=0, column=0, columnspan=3, sticky="ew", pady=(0, 14))
         self.cuadros = {}
@@ -75,7 +75,7 @@ class VistaPanel(Vista):
         self.medidor.configure(amount_total=total, amount_used=bien)
         self.leyenda.configure(text=f"{bien} bien, {r['bajos']} con poco stock, {r['agotados']} agotados")
 
-        # los que faltan, primero los que tienen menos stock
+        # los que faltan, ordenados por stock
         faltan = []
         for p in self.app.inventario.productos:
             if p.estado != "ok":

@@ -1,7 +1,3 @@
--- Base de datos del inventario
--- se copia y pega en phpMyAdmin, en la pestaña SQL
--- ojo: primero borra la base si ya existe, para empezar de cero
-
 DROP DATABASE IF EXISTS inventario_db;
 CREATE DATABASE inventario_db;
 USE inventario_db;
@@ -25,7 +21,6 @@ CREATE TABLE IF NOT EXISTS ventas (
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- productos de prueba
 INSERT INTO productos (nombre, descripcion, precio, cantidad_stock, proveedor, stock_minimo) VALUES
 ('Mouse Logitech',      'USB con cable',25,     40, 'Compu Wilson',     10),
 ('Teclado Logitech',    'Teclado USB',  45,     25, 'Compu Wilson',     8),

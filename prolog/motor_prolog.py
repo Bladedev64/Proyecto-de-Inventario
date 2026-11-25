@@ -1,13 +1,12 @@
-# Aqui se llama a SWI-Prolog para saber que productos hay que volver a pedir.
-# Las reglas estan en reglas.pl, desde Python solo mando los numeros y leo la respuesta
+# llama a Prolog para ver que productos faltan
 import os
 import shutil
 import subprocess
 
-# Prolog no acepta la \ de Windows en las rutas, por eso la cambio por /
+# Prolog usa / en las rutas
 REGLAS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "reglas.pl").replace("\\", "/")
 
-# lo que responde Prolog -> el estado que uso en Python
+# estados de Prolog a Python
 ESTADOS = {"sin_stock": "agotado", "stock_bajo": "bajo"}
 
 
@@ -21,13 +20,12 @@ def buscarSwipl():
 
 
 def revisarStock(productos):
-    # devuelve una lista de (producto, estado) con los que faltan
+    # devuelve los productos que faltan
     if len(productos) == 0:
         return []
     swipl = buscarSwipl()
 
-    # a Prolog le paso item(numero, stock, minimo) de cada producto.
-    # No le paso los nombres porque las tildes y comillas daban error
+    # no mando los nombres por las tildes
     items = []
     for i in range(len(productos)):
         p = productos[i]
@@ -39,7 +37,7 @@ def revisarStock(productos):
     if resultado.returncode != 0:
         raise RuntimeError("Prolog falló: " + resultado.stderr)
 
-    # Prolog responde una linea por producto, ej: "3 stock_bajo"
+    # Prolog responde una linea por producto
     alertas = []
     for linea in resultado.stdout.splitlines():
         partes = linea.split()

@@ -1,19 +1,16 @@
-% estado_stock(Stock, Minimo, Estado)
-% sin_stock si ya no queda, stock_bajo si quedan pocos, ok si esta bien
+% estado del stock de un producto
 estado_stock(Stock, _, sin_stock) :-
     Stock =< 0, !.
 estado_stock(Stock, Minimo, stock_bajo) :-
     Stock =< Minimo, !.
 estado_stock(_, _, ok).
 
-% reponer(Stock, Minimo, Estado)
-% se cumple cuando hay que volver a comprar el producto
+% si hay que reponer
 reponer(Stock, Minimo, Estado) :-
     estado_stock(Stock, Minimo, Estado),
     Estado \== ok.
 
-% revisar(Lista)
-% recorre la lista de item(Numero, Stock, Minimo) y escribe los que hay que reponer
+% escribe los que hay que reponer
 revisar([]).
 revisar([item(N, Stock, Minimo) | Resto]) :-
     reponer(Stock, Minimo, Estado), !,

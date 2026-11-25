@@ -5,7 +5,7 @@ import ttkbootstrap as tb
 from ui.config import AMARILLO_FILA, GRIS, ROJO, ROJO_FILA
 
 
-# un Label con el tamaño de letra que quiera, en gris o en negrita
+# crea un Label
 def texto(padre, txt="", gris=False, tam=10, negrita=False):
     fuente = f"-size {tam}"
     if negrita:
@@ -16,8 +16,7 @@ def texto(padre, txt="", gris=False, tam=10, negrita=False):
     return etiqueta
 
 
-# Clase Vista, de aqui heredan todas las pestañas
-# armar() pone los botones y tablas, refrescar() vuelve a cargar los datos
+# Clase Vista, las pestañas heredan de aqui
 class Vista(tb.Frame):
     def __init__(self, padre, app):
         super().__init__(padre, padding=(4, 14, 4, 4))
@@ -31,13 +30,11 @@ class Vista(tb.Frame):
         pass
 
 
-# Clase Tabla, un Treeview con su barra y un mensaje si esta vacia
-# cada columna es (titulo, ancho, lado), lado "w" es izquierda y "e" derecha
+# Clase Tabla, un Treeview con barra
 class Tabla(tb.Frame):
     def __init__(self, padre, columnas, alto=8, vacio="Sin datos."):
         super().__init__(padre)
 
-        # a cada columna le pongo de nombre su numero: "0", "1", "2"...
         ids = []
         for i in range(len(columnas)):
             ids.append(str(i))
@@ -45,7 +42,7 @@ class Tabla(tb.Frame):
         self.arbol = tb.Treeview(self, columns=ids, show="headings", height=alto, selectmode="browse")
         barra = tb.Scrollbar(self, command=self.arbol.yview)
         self.arbol.configure(yscrollcommand=barra.set)
-        barra.pack(side="right", fill="y")  # la barra va primero, si no la tabla ocupa todo
+        barra.pack(side="right", fill="y")  # la barra va primero
         self.arbol.pack(fill="both", expand=True)
 
         for i in range(len(columnas)):
@@ -61,7 +58,7 @@ class Tabla(tb.Frame):
         self.vacio = texto(self, vacio, gris=True)
 
     def cargar(self, filas):
-        # cada fila es (id, valores, estado). Con "bajo" sale amarilla y con "agotado" roja
+        # carga las filas en la tabla
         for fila in self.arbol.get_children():
             self.arbol.delete(fila)
         for iid, valores, estado in filas:
@@ -75,7 +72,7 @@ class Tabla(tb.Frame):
             self.vacio.place(relx=0.5, rely=0.5, anchor="center")
 
     def elegido(self):
-        # el id de la fila elegida, o None
+        # id de la fila elegida
         sel = self.arbol.selection()
         if sel:
             return int(sel[0])
@@ -83,7 +80,6 @@ class Tabla(tb.Frame):
 
 
 # Ventana para crear o editar un equipo
-# si producto es None es uno nuevo, si no se edita ese
 class FormProducto(tb.Toplevel):
     def __init__(self, catalogo, producto=None):
         if producto is None:
@@ -142,7 +138,7 @@ class FormProducto(tb.Toplevel):
     def guardar(self):
         nombre = self.nombre.get().strip()
         descripcion = self.descripcion.get().strip()
-        precio = self.precio.get().strip().replace(",", ".")  # por si escriben 25,50
+        precio = self.precio.get().strip().replace(",", ".")  # por si escriben con coma
         stock = self.stock.get().strip()
         minimo = self.minimo.get().strip()
         proveedor = self.proveedor.get().strip()
@@ -153,7 +149,6 @@ class FormProducto(tb.Toplevel):
                 self.inventario.modificarProducto(self.producto.producto_id, nombre, descripcion, precio,
                                                   stock, proveedor, minimo)
         except Exception as err:
-            # el error puede venir de Producto (dato mal puesto) o de MySQL
             self.error.configure(text=str(err))
             return
         self.destroy()

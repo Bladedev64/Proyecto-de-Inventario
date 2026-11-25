@@ -30,6 +30,10 @@ Antes de abrir el programa hay que crear la base de datos:
 2. Entra a http://localhost/phpmyadmin y ve a la pestaña SQL
 3. Copia todo el código de `base_datos.sql`, pégalo y dale Continuar
 
+Si sale "Error: #1046 Base de datos no seleccionada" no pasa nada, es un aviso de
+phpMyAdmin y la base igual se crea. Recarga la página (F5) y a la izquierda debe
+aparecer `inventario_db` con las tablas `productos` y `ventas`.
+
 Ojo: si ya tenías la base `inventario_db`, esto la borra y la crea de nuevo con los
 productos de prueba.
 

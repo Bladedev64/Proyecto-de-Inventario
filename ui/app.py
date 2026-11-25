@@ -12,7 +12,7 @@ from ui.vistas.panel import VistaPanel
 from ui.vistas.ventas import VistaVentas
 from ventas import Ventas
 
-# las pestañas: (clave, titulo, clase)
+# pestañas de la ventana
 SECCIONES = [
     ("panel", "Inicio", VistaPanel),
     ("catalogo", "Catálogo", VistaCatalogo),
@@ -21,7 +21,7 @@ SECCIONES = [
 ]
 
 
-# Clase App: la ventana principal
+# Clase App, ventana principal
 class App:
     def __init__(self, root):
         self.root = root
@@ -35,10 +35,10 @@ class App:
         root.style.configure("Treeview.Heading", font="-size 10 -weight bold")
         root.style.configure("TNotebook.Tab", padding=(18, 8), font="-size 10")
 
-        # banda de arriba: logo y nombre
+        # banda de arriba con el logo
         banda = tb.Frame(root, bootstyle="primary", padding=(24, 12))
         banda.pack(fill="x")
-        self.logo = tk.PhotoImage(file=LOGO)  # hay que guardarla en self, si no tk la borra
+        self.logo = tk.PhotoImage(file=LOGO)  # en self para que no se borre
         tb.Label(banda, image=self.logo, text=f"  {NOMBRE_TIENDA}", compound="left",
                  font="-size 15 -weight bold", bootstyle="inverse-primary").pack(side="left")
         tb.Label(banda, text=f"   {LEMA}", bootstyle="inverse-primary").pack(side="left")
@@ -48,7 +48,7 @@ class App:
         self.conectar()
 
     def conectar(self):
-        # borro lo que haya en la ventana, por si viene del boton "Intenta de nuevo"
+        # limpio la ventana
         for hijo in self.cuerpo.winfo_children():
             hijo.destroy()
         try:
@@ -80,7 +80,7 @@ class App:
         return self.vistas[clave]
 
     def datos_cambiaron(self):
-        # en la pestaña Faltantes pongo cuantos hay, ej: "Faltantes (3)"
+        # cuantos faltan en la pestaña
         faltan = self.inventario.resumen()["faltan"]
         if faltan > 0:
             self.pestanas.tab(self.vistas["alertas"], text=f"Faltantes ({faltan})")

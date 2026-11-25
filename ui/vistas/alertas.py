@@ -12,8 +12,7 @@ def cantidadStock(alerta):
     return alerta[0].cantidad_stock
 
 
-# Pestaña Faltantes: Prolog dice que equipos hay que volver a pedir.
-# Solo se revisa cuando le das al boton
+# Pestaña Faltantes, usa Prolog
 class VistaAlertas(Vista):
     def armar(self):
         tb.Button(self, text="Analiza el stock", bootstyle="primary",
@@ -58,6 +57,6 @@ class VistaAlertas(Vista):
             self.mostrar(f"Todo bien, no falta nada. Revisado a las {hora}.", "success")
 
     def mostrar(self, txt, color):
-        # la franja de color que sale encima de la tabla
+        # mensaje arriba de la tabla
         self.mensaje.configure(text=txt, bootstyle=f"inverse-{color}")
         self.mensaje.pack(fill="x", before=self.tabla, pady=(0, 8))

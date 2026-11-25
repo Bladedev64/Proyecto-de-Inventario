@@ -1,8 +1,7 @@
 from venta import Venta
 
 
-# Clase Ventas
-# guarda la lista de ventas y registra las nuevas
+# Clase Ventas, lista de ventas
 class Ventas:
     def __init__(self, db, inventario):
         self.db = db
@@ -20,7 +19,7 @@ class Ventas:
         return total
 
     def registrarVenta(self, lineas, medio_pago):
-        # lineas es una lista de (Producto, cantidad)
+        # lineas son producto y cantidad
         if len(lineas) == 0:
             raise ValueError("La lista está vacía, añade algún equipo.")
         for producto, cantidad in lineas:
@@ -40,7 +39,7 @@ class Ventas:
         try:
             self.db.registrarVenta(venta, ids)
         finally:
-            # aunque falle vuelvo a leer todo para ver el stock como esta en la base
+            # recargo aunque falle
             self.inventario.recargar()
             self.recargar()
         return venta

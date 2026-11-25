@@ -7,13 +7,13 @@ from ui.componentes import Tabla, Vista, texto
 from ui.config import MEDIOS_PAGO, ROJO, fecha, plural, soles
 
 
-# Pestaña Ventas: a la izquierda se arma la venta y a la derecha el historial
+# Pestaña Ventas
 class VistaVentas(Vista):
     def armar(self):
-        self.carrito = {}   # producto_id: cantidad
-        self.opciones = {}  # texto del combo: producto_id
+        self.carrito = {}   # id y cantidad
+        self.opciones = {}  # texto del combo e id
 
-        # izquierda: la venta nueva
+        # izquierda la venta nueva
         caja = tb.Labelframe(self, text="Nueva venta", padding=14, width=380)
         caja.pack(side="left", fill="y", padx=(0, 14))
         caja.pack_propagate(False)
@@ -27,7 +27,7 @@ class VistaVentas(Vista):
         tb.Spinbox(fila, from_=1, to=999, textvariable=self.cantidad, width=6).pack(side="left", padx=8)
         tb.Button(fila, text="Añade", bootstyle="secondary", command=self.agregar).pack(side="right")
 
-        # esto lo pongo antes que la tabla para que la tabla no tape los botones
+        # antes que la tabla para que no tape los botones
         self.btn_cobrar = tb.Button(caja, text="Completa la venta", bootstyle="primary", command=self.cobrar)
         self.btn_cobrar.pack(side="bottom", fill="x", ipady=4)
         self.error = texto(caja)
@@ -47,7 +47,7 @@ class VistaVentas(Vista):
                            alto=4, vacio="Aún no hay nada")
         self.tabla.pack(fill="both", expand=True, pady=(12, 0))
 
-        # derecha: todas las ventas
+        # derecha el historial
         caja = tb.Labelframe(self, text="Todas las ventas", padding=14)
         caja.pack(side="left", fill="both", expand=True)
         self.historial = Tabla(caja, [("#", 60, "w"), ("Fecha", 140, "w"), ("Unid.", 60, "e"),
@@ -58,7 +58,7 @@ class VistaVentas(Vista):
         self.resumen.pack(anchor="w", pady=(8, 0))
 
     def refrescar(self):
-        # en el combo solo salen los equipos que tienen stock
+        # solo los que tienen stock
         self.opciones = {}
         nombres = []
         for p in self.app.inventario.productos:
@@ -84,8 +84,7 @@ class VistaVentas(Vista):
             self.resumen.configure(text="")
 
     def lineas(self):
-        # devuelve el carrito como lista de (Producto, cantidad)
-        # si un equipo ya no existe no lo pongo
+        # productos del carrito con su cantidad
         lineas = []
         for pid, cant in self.carrito.items():
             p = self.app.inventario.buscarProducto(pid)

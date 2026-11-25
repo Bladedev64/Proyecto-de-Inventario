@@ -1,12 +1,12 @@
+import math
+
 STOCK_MINIMO = 5
 
-# el estado de un producto puede ser "ok", "bajo" o "agotado"
-# y esto es lo que se ve en las tablas
+# estados del producto
 ETIQUETAS = {"ok": "Bien", "bajo": "Poco stock", "agotado": "Agotado"}
 
 
-# Clase Producto
-# los setters revisan cada dato antes de guardarlo
+# Clase Producto, los setters validan los datos
 class Producto:
     def __init__(self, producto_id, nombre, descripcion, precio, cantidad_stock,
                  proveedor, stock_minimo=STOCK_MINIMO):
@@ -62,6 +62,8 @@ class Producto:
             precio = float(valor)
         except ValueError:
             raise ValueError("El costo va así: 25.50")
+        if not math.isfinite(precio):
+            raise ValueError("El costo va así: 25.50")
         if precio < 0:
             raise ValueError("El costo no puede ser negativo.")
         self._precio = precio
@@ -81,7 +83,7 @@ class Producto:
             raise ValueError("El stock no puede ser negativo.")
         self._cantidad_stock = stock
 
-    # STOCK MINIMO, si quedan esas unidades o menos sale como faltante
+    # STOCK MINIMO
     @property
     def stock_minimo(self):
         return self._stock_minimo
@@ -96,12 +98,12 @@ class Producto:
             raise ValueError("El mínimo no puede ser negativo.")
         self._stock_minimo = minimo
 
-    # cuanto vale todo el stock de este producto
+    # valor del stock
     @property
     def valor_en_stock(self):
         return self.precio * self.cantidad_stock
 
-    # es la misma regla que esta en prolog/reglas.pl, la uso aqui para pintar las tablas
+    # misma regla que en reglas.pl
     @property
     def estado(self):
         if self.cantidad_stock <= 0:

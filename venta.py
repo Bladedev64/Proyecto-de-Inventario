@@ -1,5 +1,4 @@
-# Clase Venta
-# una venta ya hecha no se cambia, por eso solo tiene getters
+# Clase Venta, solo getters porque no se cambia
 class Venta:
     def __init__(self, venta_id, cant_articulos, medio_pago, total, productos, fecha=None):
         if medio_pago is None or medio_pago.strip() == "":
@@ -7,10 +6,10 @@ class Venta:
         if float(total) < 0:
             raise ValueError("El total no puede ser negativo.")
         self._venta_id = venta_id
-        self._cant_articulos = int(cant_articulos)  # cuantas unidades se vendieron
+        self._cant_articulos = int(cant_articulos)  # unidades vendidas
         self._medio_pago = medio_pago.strip()
         self._total = float(total)
-        self._productos = int(productos)  # cuantos productos distintos
+        self._productos = int(productos)  # productos distintos
         self._fecha = fecha
 
     @property

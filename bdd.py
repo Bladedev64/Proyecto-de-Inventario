@@ -1,11 +1,10 @@
-# Clase BaseDatos
-# aqui esta todo lo que tiene que ver con MySQL
+# Clase BaseDatos, conexion con MySQL
 import mysql.connector
 
 from producto import Producto
 from venta import Venta
 
-# datos para entrar a MySQL. Si tu MySQL tiene otra clave cambiala aqui
+# datos de MySQL, si tu clave es otra cambiala aqui
 HOST = "localhost"
 PUERTO = 3306
 USUARIO = "root"
@@ -26,19 +25,19 @@ class BaseDatos:
         try:
             self.con = mysql.connector.connect(host=HOST, port=PUERTO, user=USUARIO, password=CLAVE)
         except mysql.connector.Error:
-            # en XAMPP el usuario root no tiene clave, entonces pruebo sin clave
+            # en XAMPP root no tiene clave
             try:
                 self.con = mysql.connector.connect(host=HOST, port=PUERTO, user=USUARIO, password="")
             except mysql.connector.Error as err:
                 raise ErrorBaseDatos(f"No hay conexión con MySQL: {err}")
 
-        # la base ya no se crea sola, hay que crearla en phpMyAdmin con base_datos.sql
+        # reviso que esten la base y las tablas
         cur = self.con.cursor()
         cur.execute("SHOW DATABASES LIKE %s", (BASE,))
         if cur.fetchone() is None:
             cur.close()
             self.cerrar()
-            raise ErrorBaseDatos(f"No hay conexión")
+            raise ErrorBaseDatos(f"No existe la base {BASE}")
         cur.execute(f"USE {BASE}")
 
         cur.execute("SHOW TABLES")
@@ -48,7 +47,7 @@ class BaseDatos:
         cur.close()
         if "productos" not in tablas or "ventas" not in tablas:
             self.cerrar()
-            raise ErrorBaseDatos(f"Faltan tablas en {BASE}.\nVuelve a correr base_datos.sql en phpMyAdmin")
+            raise ErrorBaseDatos(f"Faltan tablas en {BASE}")
 
     def cerrar(self):
         if self.con:
@@ -115,9 +114,7 @@ class BaseDatos:
         return ventas
 
     def registrarVenta(self, venta, lineas):
-        # lineas es una lista de (producto_id, cantidad)
-        # primero bajo el stock de cada producto y despues guardo la venta.
-        # Si algo falla hago rollback para que no quede la mitad guardada
+        # si algo falla hago rollback
         cur = self.con.cursor()
         try:
             for producto_id, cantidad in lineas:

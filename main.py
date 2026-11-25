@@ -1,4 +1,4 @@
-# Para abrir el programa: python main.py
+# abre el programa
 from ui.app import iniciar
 
 iniciar()

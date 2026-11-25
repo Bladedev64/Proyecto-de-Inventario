@@ -6,11 +6,11 @@ from bdd import ErrorBaseDatos
 from ui.componentes import FormProducto, Tabla, Vista, texto
 from ui.config import plural, soles
 
-# lo que sale en el combo "Estado" y el estado que busca
+# opciones del combo Estado
 ESTADOS = {"Todos": None, "Bien": "ok", "Poco stock": "bajo", "Agotados": "agotado"}
 
 
-# Pestaña Catálogo: la lista de equipos, se puede buscar, crear, editar y eliminar
+# Pestaña Catálogo
 class VistaCatalogo(Vista):
     def armar(self):
         filtros = tb.Frame(self)
@@ -56,7 +56,7 @@ class VistaCatalogo(Vista):
         self.conteo.configure(text=f"{len(lista)} de {plural(total, 'equipo', 'equipos')}")
 
     def elegido(self):
-        # da None si no hay fila elegida, y ahi los botones no hacen nada
+        # producto elegido en la tabla
         return self.app.inventario.buscarProducto(self.tabla.elegido())
 
     def nuevo(self):
@@ -84,6 +84,6 @@ class VistaCatalogo(Vista):
         self.listo()
 
     def listo(self):
-        # se llama despues de guardar, editar o eliminar
+        # despues de guardar o eliminar
         self.refrescar()
         self.app.datos_cambiaron()

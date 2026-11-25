@@ -1,6 +1,4 @@
-# Clase Inventario
-# tiene la lista de productos. Cada cambio se guarda primero en MySQL
-# y despues vuelvo a leer la lista para que quede igual que la base
+# Clase Inventario, lista de productos
 from producto import Producto, STOCK_MINIMO
 
 
@@ -38,7 +36,7 @@ class Inventario:
         return lista
 
     def resumen(self):
-        # los numeros que salen en la pestaña Inicio
+        # numeros de la pestaña Inicio
         unidades = 0
         valor = 0
         agotados = 0
@@ -62,8 +60,6 @@ class Inventario:
             "bajos": bajos,
             "faltan": agotados + bajos,
         }
-
-    # si un dato esta mal Producto() lanza ValueError y no se guarda nada
 
     def agregarProducto(self, nombre, descripcion, precio, cantidad_stock, proveedor, stock_minimo=STOCK_MINIMO):
         producto = Producto(None, nombre, descripcion, precio, cantidad_stock, proveedor, stock_minimo)
